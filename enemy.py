@@ -1,16 +1,15 @@
 import pygame
+from imagelist import ImageList
 class Enemy():
-    def __init__(self, position, width, height, pygame.sprite ):
-        self.position = position
+    def __init__(self, position, width, height, sprite ):
+        self.Rect = position
         self.width = width
         self.height = height
-        self.sprite = pygame.sprite
+        self.sprite = sprite
+     
 
-    def collide():
+    def collide(self, position, width, height):
         pass
 
-    def move():
-        pass
-
-    def draw(surface):
+    def draw(sprite, position, width, height, screen):
         pass

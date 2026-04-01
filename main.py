@@ -16,20 +16,25 @@ pygame.display.set_caption("Snake Adventures")
 snake = pygame.Surface((20, 20))
 snake.fill((255, 0, 0))
 
-while running:
-    for event in pygame.event.get():
-        
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
+def main_game():
+    running = True
+    while running:
+        for event in pygame.event.get():
+            
+            if event.type == pygame.QUIT:
                 running = False
-        #start of code
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+            #start of code
 
-    game_board.blit(snake, (100, 250))
+        game_board.blit(snake, (100, 250))
 
-    pygame.display.flip()
-    clock.tick(FPS)
+        pygame.display.flip()
+        clock.tick(FPS)
+
+if __name__ == "__main__":
+    main_game()
 
 
 pygame.quit()
