@@ -22,7 +22,7 @@ pygame.display.set_caption("Snake Adventures")
 
 
 snake = pygame.Surface((33.1/2, 31.2/2))
-snake.fill((255, 117, 31))
+snake = pygame.transform.scale(pygame.image.load("images\\snake\\head0.png"), (33.1/2, 31/2))
 food = pygame.transform.scale(pygame.image.load("images\\food_img\\coconut0.png"), (31/2, 31/2))
 food_rect = food.get_rect(center=(0, 0))
 
