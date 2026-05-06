@@ -20,9 +20,7 @@ pygame.display.set_caption("Snake Adventures")
 
 
 
-
-snake = pygame.Surface((33.1/2, 31.2/2))
-snake = pygame.transform.scale(pygame.image.load("images\\snake\\head0.png"), (33.1/2, 31/2))
+snake = pygame.transform.scale_by(pygame.image.load("images\\snake\\head0.png"), (0.3, 0.3))
 food = pygame.transform.scale(pygame.image.load("images\\food_img\\coconut0.png"), (31/2, 31/2))
 food_rect = food.get_rect(center=(0, 0))
 
@@ -33,7 +31,7 @@ def apple():
 
 
 
-def main_game():
+def main_game(game_bg, snake, food):
     
     apple_list = []
     x = 53.5/2
@@ -46,6 +44,10 @@ def main_game():
             
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.VIDEORESIZE:
+                game_bg = pygame.transform.scale(pygame.image.load("images/bg/game-background.png").convert_alpha(), (game_board.get_width(), game_board.get_height()))
+                snake = pygame.transform.scale(pygame.image.load("images\\snake\\head0.png"), (game_board.get_width()/61, game_board.get_height()/35))
+                food = pygame.transform.scale(pygame.image.load("images\\food_img\\coconut0.png"), (31/2, 31/2))
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
@@ -91,7 +93,7 @@ def main_game():
         clock.tick(FPS)
 
 if __name__ == "__main__":
-    main_game()
+    main_game(game_bg, snake, food)
 
 
 pygame.quit()
