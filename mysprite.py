@@ -1,9 +1,9 @@
 import pygame
-from imagelist import Imagelist
+from imagelist import ImageList
 import debug
 import time
 
-class Mysprite():
+class MySprite():
     def __init__(self, x, y, w, h, images, screen):
         self.Rect = (x, y, w, h)
         self._x = x
@@ -123,9 +123,9 @@ if __name__ == "__main__":
     image_rect = pygame.Rect(TEST_X, TEST_Y, TEST_W, TEST_H)
 
     spritelist = []
-    spritelist.append(Mysprite(TEST_X, TEST_Y, TEST_W, TEST_H, image_obj, screen))
+    spritelist.append(MySprite(TEST_X, TEST_Y, TEST_W, TEST_H, image_obj, screen))
     spritelist[-1].setup_anim(0, 1, 2, True)
-    spritelist.append(Mysprite(TEST_X + TEST_W, TEST_Y, TEST_W, TEST_H, image_obj, screen))
+    spritelist.append(MySprite(TEST_X + TEST_W, TEST_Y, TEST_W, TEST_H, image_obj, screen))
     spritelist[-1].setup_anim(0, 1, 2, True)
 
     

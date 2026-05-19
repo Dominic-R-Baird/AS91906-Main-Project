@@ -1,7 +1,7 @@
 from os.path import exists
 import debug
 import pygame
-class Imagelist():
+class ImageList():
     def __init__(self, filename, width, height):
         self._images = []
         count = 0
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     pygame.init()
     screen = pygame.display.set_mode((500, 500), pygame.RESIZABLE)
     
-    image_obj = Imagelist("images\\test\\test", 200, 200)
+    image_obj = ImageList("images\\test\\test", 200, 200)
     image_rect = pygame.Rect(TEST_X, TEST_Y, TEST_W, TEST_H)
 
 
