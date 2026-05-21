@@ -12,7 +12,6 @@ class Snake():
         self._y = y
         self._w = w
         self._h = h
-        self._sc = sc
 """   
 
 class Button():
@@ -31,12 +30,14 @@ class Button():
         self._x = x
         self._y = y
         return True or False
+    def contains()
     def push():
         pygame.MOUSEBUTTONDOWN
     def draw(self, surface):
         button_rect = pygame.Rect(self._x, self._y, self._w, self._h)
         if not self._bw == 0:
             pygame.draw.rect(surface, pygame.color.Color('black'), button_rect, width = 1)
+     
 
 def coconut():
     cx = random.randint(0, round(screen_width))
@@ -130,9 +131,15 @@ def main_game(game_bg, snake, food):
 
 
 def main_menu():
-
+    #load background
+    menu_bg = pygame.transform.scale(pygame.image.load("images\\bg\\menu-background.png").convert_alpha(), (screen.get_width(), screen.get_height()))
     # create the buttons
-    game_button = Button(50, 50, 100, 100, "test", MAIN_FONT, bw = 1)
+    start_button = Button(x=(screen.get_width()/2) - 100, y=192, w=195, h=97, text="test", font=MAIN_FONT, bw = 1)
+    settings_button = Button(x=(screen.get_width()/2) - 100, y=310, w=195,  h=97, text="test", font=MAIN_FONT, bw = 1)
+    exit_button = Button(x=(screen.get_width()/2) - 100, y=425, w=195,  h=99, text="test", font=MAIN_FONT, bw = 1)
+
+   
+
 
 
     quitting = False
@@ -141,9 +148,11 @@ def main_menu():
             if event.type == pygame.QUIT:
                 quitting = True
         # clear the screen
-        screen.fill(pygame.color.Color('white'))
+        screen.blit(menu_bg)
         
-        game_button.draw(screen)
+        start_button.draw(screen)
+        settings_button.draw(screen)
+        exit_button.draw(screen)                     
 
         pygame.display.flip()
     return quitting
@@ -192,6 +201,7 @@ if __name__ == "__main__":
     main_font = pygame.font.SysFont(MAIN_FONT, bold = True, size = 24)
 
     # load images
+    
     snake_images = ImageList("images\\snake\\snake", 9, 15)
     game_bg = pygame.transform.scale(pygame.image.load("images/bg/game-background.png").convert_alpha(), (screen.get_width(), screen.get_height()))
 
