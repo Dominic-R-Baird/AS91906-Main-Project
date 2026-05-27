@@ -3,6 +3,7 @@ import random
 from settings import Settings
 from imagelist import ImageList
 from mysprite import MySprite
+from button import Button
 import debug
 
 """
@@ -14,29 +15,7 @@ class Snake():
         self._h = h
 """   
 
-class Button():
-    def __init__(self, x, y, w, h, text, font, fc = pygame.color.Color('black'),bg=pygame.color.Color('white'), bw=0, bc=pygame.color.Color('black')):
-        self._x = x
-        self._y = y
-        self._w = w
-        self._h = h
-        self._text = text
-        self._font = font
-        self._fc = fc
-        self._bg = bg
-        self._bw = bw
-        self._bc = bc
-    def mouse_over_button(self, x, y):
-        self._x = x
-        self._y = y
-        return True or False
-    def contains()
-    def push():
-        pygame.MOUSEBUTTONDOWN
-    def draw(self, surface):
-        button_rect = pygame.Rect(self._x, self._y, self._w, self._h)
-        if not self._bw == 0:
-            pygame.draw.rect(surface, pygame.color.Color('black'), button_rect, width = 1)
+
      
 
 def coconut():
@@ -134,10 +113,8 @@ def main_menu():
     #load background
     menu_bg = pygame.transform.scale(pygame.image.load("images\\bg\\menu-background.png").convert_alpha(), (screen.get_width(), screen.get_height()))
     # create the buttons
-    start_button = Button(x=(screen.get_width()/2) - 100, y=192, w=195, h=97, text="test", font=MAIN_FONT, bw = 1)
-    settings_button = Button(x=(screen.get_width()/2) - 100, y=310, w=195,  h=97, text="test", font=MAIN_FONT, bw = 1)
-    exit_button = Button(x=(screen.get_width()/2) - 100, y=425, w=195,  h=99, text="test", font=MAIN_FONT, bw = 1)
-
+    
+    
    
 
 
@@ -151,8 +128,7 @@ def main_menu():
         screen.blit(menu_bg)
         
         start_button.draw(screen)
-        settings_button.draw(screen)
-        exit_button.draw(screen)                     
+                             
 
         pygame.display.flip()
     return quitting
