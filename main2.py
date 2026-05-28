@@ -6,6 +6,7 @@ from mysprite import MySprite
 from button import Button
 import debug
 
+
 """
 class Snake():
     def __init__(self, x, y, w, h):
@@ -28,6 +29,57 @@ def generate_random_coords():
     ey = random.randint(0, round(screen_height))
     return (ex, ey)
 
+def start_button_function():
+	main_game()
+
+def settings_button_function():
+	settings_menu()
+
+def exit_button_function():
+	pygame.quit()
+
+def settings_menu():
+    
+    #load background
+    menu_bg = pygame.transform.scale(pygame.image.load("images\\bg\\menu-background.png").convert_alpha(), (screen.get_width(), screen.get_height()))
+    # create the buttons
+
+
+    quitting = False
+    while not quitting:
+        # get the mouse current position
+        coords=pygame.mouse.get_pos()
+        # scale the mouse coordinates
+        scaled_coords = ( coords[0] * LOGICAL_X //screen_width , coords[1] * LOGICAL_Y //screen_height )
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quitting = True
+            
+            if event.type == pygame.MOUSEMOTION:
+                '''
+                start_button.mouse_move(coords[0], coords[1])
+                settings_button.mouse_move(coords[0], coords[1])
+                exit_button.mouse_move(coords[0], coords[1])
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                start_button.mouse_click(event)
+                settings_button.mouse_click(event)
+                exit_button.mouse_click(event)
+            if event.type == pygame.MOUSEBUTTONUP:
+                start_button.mouse_click(event)
+                settings_button.mouse_click(event)
+                exit_button.mouse_click(event)
+                '''
+                pass
+        # clear the screen
+        screen.blit(menu_bg)
+        '''
+        start_button.draw(screen)
+        settings_button.draw(screen)
+        exit_button.draw(screen)
+                   '''          
+
+        pygame.display.flip()
+    return quitting
 
 def main_game(game_bg, snake, food):
     angle = 0
@@ -108,12 +160,17 @@ def main_game(game_bg, snake, food):
         pygame.display.flip()
         clock.tick(FPS)
 
-
 def main_menu():
+
     #load background
     menu_bg = pygame.transform.scale(pygame.image.load("images\\bg\\menu-background.png").convert_alpha(), (screen.get_width(), screen.get_height()))
     # create the buttons
-    
+    start_button = Button(200,200, 200,50, "Start")
+    start_button.set_action(start_button_function)
+    settings_button = Button(200,300, 200,50, "Settings")
+    settings_button.set_action(settings_button_function)
+    exit_button = Button(200,400, 200,50, "Exit")
+    exit_button.set_action(exit_button_function)
     
    
 
@@ -121,13 +178,30 @@ def main_menu():
 
     quitting = False
     while not quitting:
+        # get the mouse current position
+        coords=pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quitting = True
+            
+            if event.type == pygame.MOUSEMOTION:
+                start_button.mouse_move(coords[0], coords[1])
+                settings_button.mouse_move(coords[0], coords[1])
+                exit_button.mouse_move(coords[0], coords[1])
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                start_button.mouse_click(event)
+                settings_button.mouse_click(event)
+                exit_button.mouse_click(event)
+            if event.type == pygame.MOUSEBUTTONUP:
+                start_button.mouse_click(event)
+                settings_button.mouse_click(event)
+                exit_button.mouse_click(event)
         # clear the screen
         screen.blit(menu_bg)
         
         start_button.draw(screen)
+        settings_button.draw(screen)
+        exit_button.draw(screen)
                              
 
         pygame.display.flip()
@@ -147,6 +221,8 @@ SNAKE_TAIL = 2
 
 MAIN_FONT = 'arial'
 
+LOGICAL_X = 800
+LOGICAL_Y = 600
 
 """
 # snake = pygame.transform.scale_by(pygame.image.load("images\\snake\\head0.png"), (0.3, 0.3))
