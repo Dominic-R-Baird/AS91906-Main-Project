@@ -11,8 +11,8 @@ class Button():
 
     FONT_COLOR = pygame.Color('Black')
     HIGHLIGHT_COLOR = pygame.Color('darkgrey')
-    BG_COLOR = pygame.Color('White')
-    BORDER_COLOR = pygame.Color('Black')
+    BG_COLOR = pygame.Color('Sienna2')
+    BORDER_COLOR = pygame.Color('paleturquoise2')
 
     def __init__(self, x, y, w, h, text, font = None, font_color = FONT_COLOR, highlight_color = HIGHLIGHT_COLOR, bg_color = BG_COLOR, border_color = BORDER_COLOR):
         # init internal variables
