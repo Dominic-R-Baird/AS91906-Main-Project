@@ -3,7 +3,7 @@ from imagelist import ImageList
 from mysprite import MySprite
 
 class Snake():
-    DEFAULT_IMAGE_SET = "\\images\\snake\snake"
+    DEFAULT_IMAGE_SET = "\\images\\snake\\snake"
     HEAD = 0
     BODY = 1
     TAIL = 2
@@ -19,7 +19,7 @@ class Snake():
         self._w = w
         self._h = h
         self._blocksize = blocksize
-        self.image_set = ImageList
+        self._image_set = ImageList
         self._direction = Snake.RIGHT
         self.set_direction( self._direction )
         self._screen = screen
@@ -28,12 +28,16 @@ class Snake():
 
     def set_direction(self, direction):
         self._direction = direction
+            # movement for up
         if direction == Snake.UP:
             self._move_vector = (0 , -self._blocksize)
+            # movement for right
         elif direction == Snake.RIGHT:
             self._move_vector = (self._blocksize , 0)
+            # movement for down
         elif direction == Snake.DOWN:
             self._move_vector = (0, self._blocksize)
+            # movement for left
         elif direction == Snake.LEFT:
             self._move_vector = (-self._blocksize, 0)
     
@@ -50,11 +54,13 @@ class Snake():
         self._segment_list.append(MySprite(self._x - self._move_vector[0], self._y - self._move_vector[1], self._w, self._h))
 
     def update(self, eating_food=False):
+        # creating the new head
         current_headpos = self._segment_list
         new_x = current_headpos._x + self._move_vector[0]
         new_y = current_headpos._y + self._move_vector[1]
         new_head = MySprite(new_x, new_y, self._w, self._h)
         self._segment_list.insert(0, new_head)
+        # checking for whether the snake ate anything and deleting the old tail
         if not eating_food:
             self._segment_list.pop()
 

@@ -89,26 +89,19 @@ def settings_menu():
         pygame.display.flip()
     return quitting
 
-def main_game(game_bg, snake, food):
-    angle = 0
-    coconut_list = []
-    enemies_list = []
-    
+def main_game(images, screen):
     x = 82
     y = 46
     snake = Snake(x, y, 16, 16, TILE_SIZE, screen)
-    bx = 52
-    by = 46
     dir_y = 0
     dir_x = 0
     running = True
-    angle = 270
     while running:
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
                 running = False
-            
+
             if event.type == pygame.VIDEORESIZE:
                 pass
             if event.type == pygame.KEYDOWN:
@@ -133,18 +126,18 @@ def main_game(game_bg, snake, food):
 
         screen.fill(pygame.color('black'))
 
-        screen.blit(game_bg, (0, 0))
+        
         for i in coconut_list:
             i.draw()
 
         for i in snake.get_segment_list:
             i.draw()
 
-        
+        screen.blit(game_bg, (0, 0))
         pygame.display.flip()
         clock.tick(FPS)
 
-def main_menu():
+def main_menu(): # this is my main menu which links to the setting menu and the game
 
     # These functions are declared here as they are local to this function
     def start_button_function():
