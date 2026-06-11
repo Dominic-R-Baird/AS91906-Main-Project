@@ -80,11 +80,11 @@ class MySprite():
         return self._y
     def set_y(self, y):
         if y>= 0 and y<= self._screen.get_height():
-            self._x = y
+            self._y = y
         elif y < 0:
-            self._x = 0
+            self._y = 0
         else:
-            self._x = self._screen.get_height() - 1
+            self._y = self._screen.get_height() - 1
 
     def set_position(self, x, y):
         self.set_x(x)
@@ -94,15 +94,15 @@ class MySprite():
         if not x_delta is None:
             self._xd = x_delta
         if not y_delta is None:
-            self._ydn = y_delta
+            self._yd = y_delta
         if not move_delay is None:
             self._move_delay = move_delay
             if not move_delay == self._move_delay:
                 self._next_move = time.time()
 
         if time.time() > self._next_move:
-            self.set_x(self.x + self._xd)
-            self.set_x(self.y + self._yd)
+            self.set_x(self._x + self._xd)
+            self.set_y(self._y + self._yd)
             self._next_move += self._move_delay
 
     x = property(get_x, set_x)
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     pygame.init()
     screen = pygame.display.set_mode((500, 500), pygame.RESIZABLE)
     
-    image_obj = Imagelist("images\\enemy\\campfire", 200, 200)
+    image_obj = ImageList("images\\enemy\\campfire", 200, 200)
     image_rect = pygame.Rect(TEST_X, TEST_Y, TEST_W, TEST_H)
 
     spritelist = []
@@ -138,9 +138,10 @@ if __name__ == "__main__":
         screen.fill((0, 0, 0))
 
         for sprite in spritelist:
-            sprite.draw()
+            # 3. Pass the dynamic direction and a small delay to the move method
+            sprite.move()
             sprite.animate()
-            sprite.move(0.1, 0, 0.5)
+            sprite.draw()
 
         pygame.display.flip()
     

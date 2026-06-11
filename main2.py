@@ -4,17 +4,9 @@ from settings import Settings
 from imagelist import ImageList
 from mysprite import MySprite
 from button import Button
+from snake import Snake
 import debug
 
-
-"""
-class Snake():
-    def __init__(self, x, y, w, h):
-        self._x = x
-        self._y = y
-        self._w = w
-        self._h = h
-"""
 
 
 def coconut():
@@ -30,7 +22,7 @@ def generate_random_coords():
 
 
 def settings_menu():
-
+    # These functions are declared here as they are local to this function
     def speed_button_function():
         speed_list = ["slow", "medium", "fast", "SPEED"]
         pass
@@ -48,7 +40,7 @@ def settings_menu():
     # load background
     menu_bg = pygame.transform.scale(pygame.image.load("images\\bg\\menu-background.png").convert_alpha(), (screen.get_width(), screen.get_height()))
     # create the buttons
-    # create the buttons
+    
     speed_button = Button(160,180, 250,50, "Speed")
     speed_button.set_action(speed_button_function)
     mapsize_button = Button(160,280, 250,50, "Mapsize")
@@ -68,7 +60,7 @@ def settings_menu():
                 quitting = True
 
             if event.type == pygame.MOUSEMOTION:
-
+                # checking coords of mouse
                 speed_button.mouse_move(coords[0], coords[1])
                 mapsize_button.mouse_move(coords[0], coords[1])
                 foodamount_button.mouse_move(coords[0], coords[1])
@@ -101,8 +93,10 @@ def main_game(game_bg, snake, food):
     angle = 0
     coconut_list = []
     enemies_list = []
+    
     x = 82
     y = 46
+    snake = Snake(x, y, 16, 16, TILE_SIZE, screen)
     bx = 52
     by = 46
     dir_y = 0
@@ -114,12 +108,9 @@ def main_game(game_bg, snake, food):
 
             if event.type == pygame.QUIT:
                 running = False
+            
             if event.type == pygame.VIDEORESIZE:
-                game_bg = pygame.transform.scale(pygame.image.load("images/bg/game-background.png").convert_alpha(), (screen.get_width(), screen.get_height()))
-                snake = pygame.transform.scale(pygame.image.load("images\\snake\\head0.png"), (screen.get_width()/61, screen.get_height()/35))
-                snake_body = pygame.transform.scale(pygame.image.load("images\\snake\\tail0.png"), (screen.get_width()/61, screen.get_height()/35))
-                food = pygame.transform.scale(pygame.image.load("images\\food_img\\coconut0.png"), (screen.get_width()/61, screen.get_height()/35))
-                fire = pygame.transform.scale(pygame.image.load("images\\enemy\\campfire0.png"), (screen.get_width()/61, screen.get_height()/35))
+                pass
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE: 
                     running = False
@@ -127,52 +118,29 @@ def main_game(game_bg, snake, food):
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:
-                    dir_y = -2.01
-                    dir_x = 0
-                    angle = 0
+                    snake.direction = Snake.UP
                 if event.key == pygame.K_s:
-                    dir_y = 2.01
-                    dir_x = 0
-                    angle = 180
+                    snake.direction = Snake.DOWN
                 if event.key == pygame.K_a:
-                    dir_x = -2
-                    dir_y = 0
-                    angle = 90
+                    snake.direction = Snake.LEFT
                 if event.key == pygame.K_d:
-                    dir_x = 2
-                    dir_y = 0
-                    angle = 270
+                    snake.direction = Snake.RIGHT
         y += (31/2)*dir_y
         x += (31/2)*dir_x
-        by += (31/2)*dir_y
-        bx += (31/2)*dir_x
+
         if x < 0 or y < 0 or x + 20 > screen.get_width() or y + 20 > screen.get_height():
             running = False
 
-        if len(coconut_list) <= 0:
-            cx, cy = coconut()
-            food_rect.x = cx
-            food_rect.y = cy
-            coconut_list.append(MySprite(cx, cy, food.width, food.height, ImageList("images\\food_img\\coconut",  food.width, food.height), screen))
-            coconut_list[-1].setup_anim(0, 0, 2, True)
-            print(food_rect)
-        """
-        if len(enemies_list) <= 0:
-            ex, ey = generate_random_coords()
-            fire_rect.x = ex
-            fire_rect.y = ey
-            enemies_list.append(MySprite(ex, ey, fire.width, fire.height, ImageList("images\\enemy\\campfire",  fire.width, fire.height), game_board))
-            print(fire_rect)
-        """
         screen.fill(pygame.color('black'))
 
         screen.blit(game_bg, (0, 0))
         for i in coconut_list:
             i.draw()
 
-        #game_board.blit(fire, (ex, ey))
-        screen.blit(pygame.transform.rotate(snake, angle), (x, y))
-        #game_board.blit(pygame.transform.rotate(snake_body, angle), (bx, by))
+        for i in snake.get_segment_list:
+            i.draw()
+
+        
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -247,16 +215,7 @@ MAIN_FONT = 'arial'
 LOGICAL_X = 800
 LOGICAL_Y = 600
 
-"""
-# snake = pygame.transform.scale_by(pygame.image.load("images\\snake\\head0.png"), (0.3, 0.3))
-# snake_body = pygame.transform.scale_by(pygame.image.load("images\\snake\\tail0.png"), (0.3, 0.3))
-snake = snake_images.images[SNAKE_HEAD]
-snake_body = snake_images.images[SNAKE_TAIL]
-food = pygame.transform.scale(pygame.image.load("images\\food_img\\coconut0.png"), (31/2, 31/2))
-food_rect = food.get_rect(center=(0, 0))
-fire = pygame.transform.scale(pygame.image.load("images\\enemy\\campfire0.png"), (31/2, 31/2))
-fire_rect = fire.get_rect(center=(0, 0))
-"""
+
 
 if __name__ == "__main__":
 
