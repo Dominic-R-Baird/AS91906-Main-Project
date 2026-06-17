@@ -1,7 +1,13 @@
+"""This file helps to creates my sprites."""
+
 import pygame
 from imagelist import ImageList
 import debug
 import time
+
+"""this is so my snake and food can have collison"""
+"""and can also be drawn"""
+
 
 class MySprite():
     def __init__(self, x, y, w, h, images, screen):
@@ -23,11 +29,14 @@ class MySprite():
         self._move_delay = 0
 
     def collide(self, other_rect):
-       if isinstance(other_rect, pygame.Rect):
-        if not (self._x + self._w < other_rect.x or self._y > other_rect.y + other_rect.h or self._x > other_rect.x + other_rect.w or self._y + self._h < other_rect.y):
-            return True
-        else:
-            return False
+        if isinstance(other_rect, pygame.Rect):
+            if not (self._x + self._w < other_rect.x
+                    or self._y > other_rect.y + other_rect.h
+                    or self._x > other_rect.x + other_rect.w
+                    or self._y + self._h < other_rect.y):
+                return True
+            else:
+                return False
 
     def get_rect(self):
         return pygame.Rect(self._x, self._y, self._w, self._h)
@@ -46,40 +55,44 @@ class MySprite():
 
         self._next_frame = time.time() + delay
 
-    def animate(self, reset_animation = False):
-        #If we're animating
+    def animate(self, reset_animation=False):
+        # If we're animating
         if not self._delay == -1:
-            #if we're resetting
-            if reset_animation == True:
+            # if we're resetting
+            if reset_animation is True:
                 self._current_frame = self._start_frame
             else:
                 if time.time() > self._next_frame:
-                    #go to out next frame
+                    # go to out next frame
                     if self._current_frame < self._end_frame:
                         self._current_frame += 1
-                    elif self._repeat == True:
+                    elif self._repeat is True:
                         self._current_frame = self._start_frame
                     # push out the next frame time
                     self._next_frame = self._next_frame + self._delay
         print(self._current_frame)
 
     def draw(self):
-        self._screen.blit(self._images.images[self._current_frame], self.get_rect())
+        self._screen.blit(self._images.images[self._current_frame],
+                          self.get_rect())
 # internal get / set functions
+
     def get_x(self):
         return self._x
+
     def set_x(self, x):
-        if x>= 0 and x<= self._screen.get_width():
+        if x >= 0 and x <= self._screen.get_width():
             self._x = x
         elif x < 0:
             self._x = 0
         else:
             self._x = self._screen.get_width() - 1
-    
+
     def get_y(self):
         return self._y
+
     def set_y(self, y):
-        if y>= 0 and y<= self._screen.get_height():
+        if y >= 0 and y <= self._screen.get_height():
             self._y = y
         elif y < 0:
             self._y = 0
@@ -90,12 +103,12 @@ class MySprite():
         self.set_x(x)
         self.set_y(y)
 
-    def move(self, x_delta = None, y_delta = None, move_delay = None):
-        if not x_delta is None:
+    def move(self, x_delta=None, y_delta=None, move_delay=None):
+        if x_delta is not None:
             self._xd = x_delta
-        if not y_delta is None:
+        if y_delta is not None:
             self._yd = y_delta
-        if not move_delay is None:
+        if move_delay is not None:
             self._move_delay = move_delay
             if not move_delay == self._move_delay:
                 self._next_move = time.time()
@@ -108,7 +121,7 @@ class MySprite():
     x = property(get_x, set_x)
     y = property(get_y, set_y)
 
-        
+
 debug.DEBUG_LEVEL = 2
 if __name__ == "__main__":
     TEST_X = 100
@@ -118,31 +131,33 @@ if __name__ == "__main__":
 
     pygame.init()
     screen = pygame.display.set_mode((500, 500), pygame.RESIZABLE)
-    
+
     image_obj = ImageList("images\\enemy\\campfire", 200, 200)
     image_rect = pygame.Rect(TEST_X, TEST_Y, TEST_W, TEST_H)
 
     spritelist = []
-    spritelist.append(MySprite(TEST_X, TEST_Y, TEST_W, TEST_H, image_obj, screen))
+    spritelist.append(MySprite(TEST_X, TEST_Y, TEST_W, TEST_H,
+                               image_obj, screen))
     spritelist[-1].setup_anim(0, 1, 2, True)
-    spritelist.append(MySprite(TEST_X + TEST_W, TEST_Y, TEST_W, TEST_H, image_obj, screen))
+    spritelist.append(MySprite(TEST_X + TEST_W, TEST_Y, TEST_W,
+                               TEST_H, image_obj, screen))
     spritelist[-1].setup_anim(0, 1, 2, True)
 
-    
     quitting = False
     while not quitting:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quitting = True
-            
+
         screen.fill((0, 0, 0))
 
         for sprite in spritelist:
-            # 3. Pass the dynamic direction and a small delay to the move method
+            # 3. Pass the dynamic direction and
+            # a small delay to the move method
             sprite.move()
             sprite.animate()
             sprite.draw()
 
         pygame.display.flip()
-    
+
     pygame.quit()

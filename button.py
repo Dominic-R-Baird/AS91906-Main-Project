@@ -9,10 +9,10 @@ class Button():
     DEFAULT_FONT = 'freesansbold.ttf'
     DEFAULT_FONT_SIZE = 32
 
-    FONT_COLOR = pygame.Color('mintcream')
+    FONT_COLOR = pygame.Color('black')
     HIGHLIGHT_COLOR = pygame.Color('darkgrey')
-    BG_COLOR = pygame.Color('Sienna2')
-    BORDER_COLOR = pygame.Color('Sienna2')
+    BG_COLOR = pygame.Color('white')
+    BORDER_COLOR = pygame.Color('blue')
 
     def __init__(self, x, y, w, h, text, font = None, font_color = FONT_COLOR, highlight_color = HIGHLIGHT_COLOR, bg_color = BG_COLOR, border_color = BORDER_COLOR):
         # init internal variables
@@ -54,7 +54,7 @@ class Button():
         return self.get_rect().collidepoint(x, y)
     
     def get_rect(self):
-        return pygame.Rect(self._x, self._y, self._w, self._h)
+        return pygame.Rect(self._x - self._w / 2, self._y, self._w, self._h)
     def mouse_move(self, x, y):
         if not self._disabled:
             if self.contains( x, y):
@@ -80,7 +80,7 @@ class Button():
     def draw(self, screen):
         # draw rectangle
         pygame.draw.rect(screen, self._border_color, self.get_rect())
-        pygame.draw.rect(screen, self._bg_color, pygame.Rect(self._x + self._border, self._y + self._border, self._w - self._border*2, self._h - self._border*2))
+        #pygame.draw.rect(screen, self._bg_color, pygame.Rect(self._x + self._border, self._y + self._border, self._w - self._border*2, self._h - self._border*2))
 
         # draw the text
         color = self._font_color
@@ -93,7 +93,7 @@ class Button():
         
         rendered_text = self._font.render(self._text, True, color, self._bg_color)
         rendered_text_rect = rendered_text.get_rect()
-        rendered_text_rect.center = (self._x + self._w / 2 + offset, self._y + self._h / 2 + offset)
+        rendered_text_rect.center = (self._x + offset, self._y + self._h / 2 + offset)
         screen.blit(rendered_text, rendered_text_rect)
 
         # Testing Code
@@ -113,9 +113,10 @@ if __name__ == "__main__":\
     pygame.init()
     screen = pygame.display.set_mode((800, 600), pygame.RESIZABLE)
     quitting = False
-    
-    my_button = Button(TEST_X, TEST_Y+TEST_H, TEST_W, TEST_H, "OK", border_color=BLUE)
-    my_button.action = test_click
+
+    custom_font = pygame.font.Font("freesansbold.ttf", 32)
+    my_button = Button(TEST_X, TEST_Y+TEST_H, TEST_W, TEST_H, "OK", font=custom_font)
+    my_button.set_action(test_click)
 
     while not quitting:
         coords = pygame.mouse.get_pos()

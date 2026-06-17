@@ -1,19 +1,25 @@
+"""This file conatins my snake class."""
+
 import pygame
 from imagelist import ImageList
 from mysprite import MySprite
 
+"""which tells it how to move in certain directions."""
+
+
 class Snake():
+    """Represents the snake that will be used in my game."""
+
     DEFAULT_IMAGE_SET = "\\images\\snake\\snake"
     HEAD = 0
     BODY = 1
     TAIL = 2
-    UP      = 1
-    RIGHT   = 2
-    DOWN    = 3
-    LEFT    = 3
+    UP = 1
+    RIGHT = 2
+    DOWN = 3
+    LEFT = 3
 
-
-    def __init__(self, x, y, w, h, blocksize, screen):
+    def __init__(self, x, y, w, h, blocksize, screen, images):
         self._x = x
         self._y = y
         self._w = w
@@ -21,40 +27,45 @@ class Snake():
         self._blocksize = blocksize
         self._image_set = ImageList
         self._direction = Snake.RIGHT
-        self.set_direction( self._direction )
+        self.set_direction(self._direction)
         self._screen = screen
-        self._images = ImageList(Snake.DEFAULT_IMAGE_SET, self._blocksize, self._blocksize)
+        self._images = images
         self.reset()
 
     def set_direction(self, direction):
+        """Give directions to certain keys."""
         self._direction = direction
-            # movement for up
+        # movement for up
         if direction == Snake.UP:
-            self._move_vector = (0 , -self._blocksize)
+            self._move_vector = (0, -self._blocksize)
             # movement for right
         elif direction == Snake.RIGHT:
-            self._move_vector = (self._blocksize , 0)
+            self._move_vector = (self._blocksize, 0)
             # movement for down
         elif direction == Snake.DOWN:
             self._move_vector = (0, self._blocksize)
             # movement for left
         elif direction == Snake.LEFT:
             self._move_vector = (-self._blocksize, 0)
-    
-    def get_direction(self):
-        return self._direction
-    
-    direction = property(get_direction, set_direction)
 
+    def get_direction(self):
+        """Allow other files to use the directions."""
+        return self._direction
+
+    direction = property(get_direction, set_direction)
 
     def reset(self):
         # creating the head and tail
         self._segment_list = []
-        self._segment_list.append(MySprite(self._x, self._y, self._w, self._h))
-        self._segment_list.append(MySprite(self._x - self._move_vector[0], self._y - self._move_vector[1], self._w, self._h))
+        self._segment_list.append(MySprite(self._x, self._y, self._w, self._h,
+                                           self._images, self._screen))
+        self._segment_list.append(MySprite(self._x - self._move_vector[0],
+                                           self._y - self._move_vector[1],
+                                           self._w, self._h, self._images,
+                                           self._screen))
 
     def update(self, eating_food=False):
-        # creating the new head
+        """Create new head and check if food is being eaten."""
         current_headpos = self._segment_list
         new_x = current_headpos._x + self._move_vector[0]
         new_y = current_headpos._y + self._move_vector[1]
@@ -66,3 +77,7 @@ class Snake():
 
     def get_segment_list(self):
         return self._segment_list
+
+    def draw(self):
+        for segment in self._segment_list:
+            segment.draw()
