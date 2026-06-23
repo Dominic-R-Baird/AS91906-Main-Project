@@ -10,7 +10,7 @@ import time
 
 
 class MySprite():
-    def __init__(self, x, y, w, h, images, screen):
+    def __init__(self, x, y, w, h, images, screen, direction=None):
         self.Rect = (x, y, w, h)
         self._x = x
         self._y = y
@@ -27,13 +27,14 @@ class MySprite():
         self._repeat = False
         self._next_move = time.time()
         self._move_delay = 0
+        self._direction = direction
 
     def collide(self, other_rect):
         if isinstance(other_rect, pygame.Rect):
-            if not (self._x + self._w < other_rect.x
-                    or self._y > other_rect.y + other_rect.h
-                    or self._x > other_rect.x + other_rect.w
-                    or self._y + self._h < other_rect.y):
+            if not (self._x + self._w - 1 < other_rect.x
+                    or self._y > other_rect.y + other_rect.h - 1
+                    or self._x > other_rect.x + other_rect.w - 1
+                    or self._y + self._h - 1 < other_rect.y):
                 return True
             else:
                 return False
@@ -44,6 +45,7 @@ class MySprite():
     def setup_anim(self, start_frame=0, end_frame=0, delay=0, repeat=False):
         if start_frame >= 0 and start_frame < len(self._images.images):
             self._start_frame = start_frame
+            self._current_frame = start_frame
         if end_frame >= 0 and end_frame < len(self._images.images) and start_frame <= end_frame:
             self._end_frame = end_frame
         if delay > 0:
@@ -70,11 +72,15 @@ class MySprite():
                         self._current_frame = self._start_frame
                     # push out the next frame time
                     self._next_frame = self._next_frame + self._delay
-        print(self._current_frame)
 
     def draw(self):
-        self._screen.blit(self._images.images[self._current_frame],
-                          self.get_rect())
+        if self._direction is None:
+            self._screen.blit(self._images.images[self._current_frame],
+                              self.get_rect())
+        else:
+            self._screen.blit(pygame.transform.rotate(self._images.images[self._current_frame], self._direction),
+                              self.get_rect())
+
 # internal get / set functions
 
     def get_x(self):
@@ -117,6 +123,12 @@ class MySprite():
             self.set_x(self._x + self._xd)
             self.set_y(self._y + self._yd)
             self._next_move += self._move_delay
+    
+    def set_direction(self, direction):
+        self._direction = direction
+    def get_direction(self):
+        return self._direction
+    direction = property(get_direction, set_direction)
 
     x = property(get_x, set_x)
     y = property(get_y, set_y)

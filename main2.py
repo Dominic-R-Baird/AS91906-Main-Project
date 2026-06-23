@@ -5,6 +5,8 @@ from imagelist import ImageList
 from mysprite import MySprite
 from button import Button
 from snake import Snake
+from food import Food
+from enemy import Enemy
 import debug
 
 
@@ -24,35 +26,30 @@ import debug
 def settings_menu(screen, font_object):
     global screen_height
     global screen_width
+    # create logical canvas to scale
+    canvas = pygame.Surface((LOGICAL_X, LOGICAL_Y))
     # These functions are declared here as they are local to this function
     def speed_button_function():
         speed_list = ["slow", "medium", "fast", "SPEED"]
         pass
-
     def mapsize_button_function():
         mapsize_list = ["small", "medium", "FULLSCREEN"]
-        pass
-    def foodamount_button_function():
-        foodamount_list = ["normal", "big batch", "THE WHOLE BASKET" ]
         pass
     def return_button_function():
         nonlocal quitting
         quitting = True
 
     # load background
-    menu_bg = pygame.transform.scale(pygame.image.load("images\\bg\\menu-background.png").convert_alpha(), (screen.get_width(), screen.get_height()))
+    settings_bg = pygame.transform.scale(pygame.image.load("images\\bg\\menu-background.png").convert_alpha(), (LOGICAL_X, LOGICAL_Y))
     # create the buttons
-    
-    speed_button = Button(160,180, 250,50, "Speed", font_object, FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
+
+    speed_button = Button(160,180, BUTTON_WIDTH, BUTTON_HEIGHT, "Speed", font_object, FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
     speed_button.set_action(speed_button_function)
-    mapsize_button = Button(160,280, 250,50, "Mapsize", font_object, FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
+    mapsize_button = Button(160,300, BUTTON_WIDTH, BUTTON_HEIGHT, "Mapsize", font_object, FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
     mapsize_button.set_action(mapsize_button_function)
-    foodamount_button = Button(160,380, 250,50, "# of Coconuts", font_object, FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
-    foodamount_button.set_action(foodamount_button_function)
-    return_button = Button(160,480, 250,50, "Return", font_object, FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
+    return_button = Button(160,420, BUTTON_WIDTH, BUTTON_HEIGHT, "Return", font_object, FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
     return_button.set_action(return_button_function)
-    # create logical canvas to scale
-    canvas = pygame.Surface((LOGICAL_X, LOGICAL_Y))
+    
 
     quitting = False
     while not quitting:
@@ -71,26 +68,22 @@ def settings_menu(screen, font_object):
                 # checking coords of mouse
                 speed_button.mouse_move(scaled_coords[0], scaled_coords[1])
                 mapsize_button.mouse_move(scaled_coords[0], scaled_coords[1])
-                foodamount_button.mouse_move(scaled_coords[0], scaled_coords[1])
                 return_button.mouse_move(scaled_coords[0], scaled_coords[1])
             if event.type == pygame.MOUSEBUTTONDOWN:
                 speed_button.mouse_click(event)
                 mapsize_button.mouse_click(event)
-                foodamount_button.mouse_click(event)
                 return_button.mouse_click(event)
             if event.type == pygame.MOUSEBUTTONUP:
                 speed_button.mouse_click(event)
                 mapsize_button.mouse_click(event)
-                foodamount_button.mouse_click(event)
                 return_button.mouse_click(event)
 
 
         # clear the screen
-        canvas.blit(menu_bg)
+        canvas.blit(settings_bg)
 
         speed_button.draw(canvas)
         mapsize_button.draw(canvas)
-        foodamount_button.draw(canvas)
         return_button.draw(canvas)
 
         # scale the canvas and blit
@@ -103,32 +96,75 @@ def main_game(screen, canvas):
     # Constants
     FPS = 2
     # 16 x 9 aspect ratio
-    TILE_SIZE = 16
+    TILE_SIZE = 32
 
-    TILES_ACROSS = 48
+    TILES_ACROSS = 24
 
-    TILES_DOWN = 36
-    X_OFFSET = LOGICAL_X - (TILE_SIZE*TILES_ACROSS)/2
-    Y_OFFSET = LOGICAL_Y - (TILE_SIZE*TILES_DOWN)
+    TILES_DOWN = 17
+    X_OFFSET = (LOGICAL_X - (TILE_SIZE*TILES_ACROSS))/2
+    Y_OFFSET =  LOGICAL_Y - (TILE_SIZE*TILES_DOWN)
 
+    ENEMY_AMOUNT = 5
     global screen_height
     global screen_width
 
     SNAKE_HEAD = 0
     SNAKE_BODY = 1
     SNAKE_TAIL = 2
-    x = 82
-    y = 46
-    
+    def draw_map():
+        BEACH_PERCENT = 0.7
+        BEACH_TILES_X = int(TILES_ACROSS * BEACH_PERCENT)
+        map_colors = {
+            "beach": [ (255, 235, 153), (255, 222, 89)],
+            "water": [ (81, 112, 255), (92, 225, 230) ]
+        }
+        game_screen = pygame.Surface((LOGICAL_X, LOGICAL_Y))
+        game_screen.fill(map_colors["beach"][1])
+        flag = False
+        y_count = 0
+        while y_count < TILES_DOWN:
+            x_count = 0
+            while x_count < TILES_ACROSS:
+                # choose color list
+                if x_count < BEACH_TILES_X:
+                    color_list = map_colors["beach"]
+                else:
+                    color_list = map_colors['water']
+                # choose color from that list
+                if flag:
+                    tile_color = color_list[0]
+                else:
+                    tile_color = color_list[1]
+                pygame.draw.rect(game_screen, tile_color, pygame.Rect(x_count * TILE_SIZE + X_OFFSET, y_count * TILE_SIZE + Y_OFFSET, TILE_SIZE, TILE_SIZE))
+                flag = not flag
+                x_count += 1
+            y_count += 1
+            if TILES_ACROSS % 2 == 0:
+                flag = not flag
+        return game_screen
+    def spawn_enemy(amount, canvas):
+        enemy_list = []
+        for count in range(amount):
+            enemy_list.append(Enemy(random.randint(0, TILES_ACROSS - 1) * TILE_SIZE + X_OFFSET, random.randint(0, TILES_DOWN - 1) * TILE_SIZE + Y_OFFSET,
+                                    TILE_SIZE, TILE_SIZE, canvas, enemy_images))
+            enemy_list[-1].setup_anim(start_frame=0, end_frame=1, delay=0.5, repeat=True)
+        
+        return enemy_list
+
     canvas = pygame.Surface((LOGICAL_X, LOGICAL_Y))
     # load images
-    snake_images = ImageList("images\\snake\\snake", 9, 15)
-    game_bg = pygame.transform.scale(pygame.image.load("images/bg/game-background.png").convert_alpha(), (screen.get_width(), screen.get_height()))
-    snake = Snake(x, y, 16, 16, TILE_SIZE, canvas, snake_images)
-
+    snake_images = ImageList("images\\snake\\snake", TILE_SIZE, TILE_SIZE)
+    food_image = ImageList("images\\food_img\\coconut", TILE_SIZE, TILE_SIZE)
+    enemy_images = ImageList("images\\enemy\\campfire", TILE_SIZE, TILE_SIZE)
+    game_bg = draw_map()
+    snake = Snake(random.randrange(1, TILES_ACROSS//2) * TILE_SIZE + X_OFFSET, random.randrange(1, TILES_DOWN//2) * TILE_SIZE + Y_OFFSET, TILE_SIZE, TILE_SIZE, TILE_SIZE, canvas, snake_images)
+    food = None
+    enemy_list = spawn_enemy(ENEMY_AMOUNT, canvas)
+    arena_rect = pygame.Rect(0, 0, TILES_ACROSS * TILE_SIZE + X_OFFSET, TILES_DOWN * TILE_SIZE + Y_OFFSET)
     """def quit_button_function():
         nonlocal quitting
         quitting = True"""
+
     running = True
     while running:
         # get the mouse current position
@@ -158,18 +194,37 @@ def main_game(screen, canvas):
                     snake.direction = Snake.LEFT
                 if event.key == pygame.K_d:
                     snake.direction = Snake.RIGHT
-        if x < 0 or y < 0 or x + 20 > screen.get_width() or y + 20 > screen.get_height():
-            running = False
+        if food is None:
+            food = Food(random.randint(0, TILES_ACROSS - 1) * TILE_SIZE + X_OFFSET, random.randint(0, TILES_DOWN - 1) * TILE_SIZE + Y_OFFSET,
+                        TILE_SIZE, TILE_SIZE, canvas, food_image)
+        if food.collide(snake.get_rect()):
+            snake.update(eating_food=True)
+            food = None
+            food = Food(random.randint(0, TILES_ACROSS - 1) * TILE_SIZE + X_OFFSET, random.randint(0, TILES_DOWN - 1) * TILE_SIZE + Y_OFFSET,
+                        TILE_SIZE, TILE_SIZE, canvas, food_image)
+        else:
+            snake.update()
+        
+        for enemy in enemy_list:
+            if enemy.collide(snake.get_rect()):
+                snake.die = True
+        if not snake.collide(arena_rect) or snake.collide_self():
+            snake.die = True
+        if snake.die:
+            snake = Snake(random.randrange(1, TILES_ACROSS//2) * TILE_SIZE + X_OFFSET,
+                          random.randrange(1, TILES_DOWN//2) * TILE_SIZE + Y_OFFSET,
+                          TILE_SIZE, TILE_SIZE, TILE_SIZE, canvas, snake_images)
+
+
+        # **** MAIN DRAWING SECTION ***
         # clearing the screen
         canvas.fill(pygame.Color('black'))
-
-        
-        #for i in coconut_list:
-            #i.draw()
-
-
         canvas.blit(game_bg, (0, 0))
-
+        # draw interactive elements
+        food.draw()
+        for enemy in enemy_list:
+            enemy.draw()
+            enemy.animate()
         snake.draw()
         # scale the canvas and blit
         scaled_canvas = pygame.transform.scale(canvas,(screen_width, screen_height))
@@ -182,8 +237,8 @@ def main_menu(screen, font_object): # this is my main menu which links to the se
     global screen_height
     global screen_width
 
-    
 
+    # create logical canvas to scale
     canvas = pygame.Surface((LOGICAL_X, LOGICAL_Y))
 
     # These functions are declared here as they are local to this function
@@ -198,13 +253,13 @@ def main_menu(screen, font_object): # this is my main menu which links to the se
         quitting = True
 
     # load background
-    menu_bg = pygame.transform.scale(pygame.image.load("images\\bg\\menu-background.png").convert_alpha(), (screen.get_width(), screen.get_height()))
+    menu_bg = pygame.transform.scale(pygame.image.load("images\\bg\\menu-background.png").convert_alpha(), (LOGICAL_X, LOGICAL_Y))
     # create the buttons
-    start_button = Button(canvas.get_width()/2, (canvas.get_height()/6) * 2, 200, 50, "Start", font_object, FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
+    start_button = Button(canvas.get_width()/2, (canvas.get_height()/6) * 2, BUTTON_WIDTH, BUTTON_HEIGHT, "Start", font_object, FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
     start_button.set_action(start_button_function)
-    settings_button = Button(canvas.get_width()/2, (canvas.get_height()/6) * 3, 200,50, "Settings", font_object, FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
+    settings_button = Button(canvas.get_width()/2, (canvas.get_height()/6) * 3, BUTTON_WIDTH, BUTTON_HEIGHT, "Settings", font_object, FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
     settings_button.set_action(settings_button_function)
-    exit_button = Button(canvas.get_width()/2, (canvas.get_height()/6) * 4, 200,50, "Exit", font_object, FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
+    exit_button = Button(canvas.get_width()/2, (canvas.get_height()/6) * 4, BUTTON_WIDTH, BUTTON_HEIGHT, "Exit", font_object, FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
     exit_button.set_action(exit_button_function)
 
     quitting = False
@@ -220,7 +275,7 @@ def main_menu(screen, font_object): # this is my main menu which links to the se
                 screen_width, screen_height = event.dict['size']
                 print(event.dict['size'])
                 screen = pygame.display.set_mode(event.dict['size'], pygame.RESIZABLE)
-                
+
             if event.type == pygame.MOUSEMOTION:
                 start_button.mouse_move(scaled_coords[0], scaled_coords[1])
                 settings_button.mouse_move(scaled_coords[0], scaled_coords[1])
@@ -239,7 +294,7 @@ def main_menu(screen, font_object): # this is my main menu which links to the se
         start_button.draw(canvas)
         settings_button.draw(canvas)
         exit_button.draw(canvas)
-      
+
         # scale the canvas and blit
         scaled_canvas = pygame.transform.scale(canvas,(screen_width, screen_height))
         screen.blit(scaled_canvas, (0,0))
@@ -257,12 +312,16 @@ HIGHLIGHT_COLOR = pygame.Color('darkgrey')
 BG_COLOR = pygame.Color('Sienna2')
 BORDER_COLOR = pygame.Color('Sienna2')
 
+# button sizes
+BUTTON_WIDTH = 250
+BUTTON_HEIGHT = 50
+
 if __name__ == "__main__":
 
     # initialisation
     #inital screen width and height
-    screen_width = 800
-    screen_height = 600
+    screen_width = LOGICAL_X
+    screen_height = LOGICAL_Y
     # init the clock for FPS limit
     clock = pygame.time.Clock()
 
