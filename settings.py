@@ -16,7 +16,7 @@ class Settings():
         # check for file and load settings
 
 
-    
+
     def write_json(self, filename, object):
         try:
             output_file = open(filename, "w", encoding="utf-8")
@@ -27,7 +27,6 @@ class Settings():
             print("Failed to open file")
             return False
 
-    
     def write_settings(self):
         result = self.write_json(self._filename, self._settings)
         return result
@@ -36,11 +35,11 @@ class Settings():
         try:
            with open(filename, "r", encoding="utf-8") as input_file:
             return json.load(input_file)
-           
+
         except:
             pass
 
-   
+
     def get_brightness(self):
         return self._settings["brightness"]
     def set_brightness(self, brightness):
@@ -49,15 +48,6 @@ class Settings():
             exit(0)
 
     brightness = property(get_brightness, set_brightness, None)
-
-
-
-
-
-
-
-
-
 
 if __name__ == "__main__":
     print("testing not yet implemented")

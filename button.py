@@ -1,7 +1,13 @@
+"""This file is to create by buttons for my game."""
 import pygame
 
+
 class Button():
-   # class defaults
+    """This class creates the button."""
+
+    """and lets it check for whether it is being clicked."""
+
+    # class defaults
     MIN_BUTTON_W = 100
     MIN_BUTTON_H = 50
     CLICK_OFFSET = 5
@@ -14,12 +20,14 @@ class Button():
     BG_COLOR = pygame.Color('white')
     BORDER_COLOR = pygame.Color('blue')
 
-    def __init__(self, x, y, w, h, text, font = None, font_color = FONT_COLOR, highlight_color = HIGHLIGHT_COLOR, bg_color = BG_COLOR, border_color = BORDER_COLOR):
-        # init internal variables
+    def __init__(self, x, y, w, h, text, font=None,
+                 font_color=FONT_COLOR, highlight_color=HIGHLIGHT_COLOR,
+                 bg_color=BG_COLOR, border_color=BORDER_COLOR):
+        """Initialise the button scale and colors."""
         self._mouse_over = False
         self._button_down = False
-        self._disabled = False  # need to make property for this.
-        self._border = 4        # border width. not configurable yet 
+        self._disabled = False
+        self._border = 4
 
         if w < Button.MIN_BUTTON_W:
             self._w = Button.MIN_BUTTON_W
@@ -33,8 +41,9 @@ class Button():
         self._y = y
         self._text = text
         if font is None:
-            self._font = pygame.font.Font( Button.DEFAULT_FONT, Button.DEFAULT_FONT_SIZE)
-        else: 
+            self._font = pygame.font.Font(Button.DEFAULT_FONT,
+                                          Button.DEFAULT_FONT_SIZE)
+        else:
             self._font = font
         self._font_color = font_color
         self._bg_color = bg_color
@@ -43,44 +52,50 @@ class Button():
         self._down = False
         self._action = None
 
-
     def click(self):
-        if self._action == None:
+        """Click the button."""
+        if self._action is None:
             print("No action function set for button:", self._text)
         else:
             self._action()
 
     def contains(self, x, y):
+        """Make collide points for mouse and button."""
         return self.get_rect().collidepoint(x, y)
-    
+
     def get_rect(self):
+        """Get the rectangle."""
         return pygame.Rect(self._x - self._w / 2, self._y, self._w, self._h)
+
     def mouse_move(self, x, y):
+        """Check whether mouse is within the button."""
         if not self._disabled:
-            if self.contains( x, y):
+            if self.contains(x, y):
                 self._mouse_over = True
             else:
                 self._mouse_over = False
 
     def mouse_click(self, event):
+        """Check if mouse clicked button."""
         if not self._disabled:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self._mouse_over:
                     self._button_down = True
             elif event.type == pygame.MOUSEBUTTONUP:
                 if self._button_down and self._mouse_over:
-                    if not self._action is None:
-                        self._action() # I'm clicked
+                    if self._action is not None:
+                        self._action()
+                        # I'm clicked
                 self._button_down = False
 
     def set_action(self, action_function):
+        """Make an action if something occurs."""
         if type(action_function).__name__ == 'function':
-            self._action = action_function	
+            self._action = action_function
 
     def draw(self, screen):
-        # draw rectangle
+        """Draw the rectangle for button."""
         pygame.draw.rect(screen, self._border_color, self.get_rect())
-        #pygame.draw.rect(screen, self._bg_color, pygame.Rect(self._x + self._border, self._y + self._border, self._w - self._border*2, self._h - self._border*2))
 
         # draw the text
         color = self._font_color
@@ -90,15 +105,19 @@ class Button():
                 offset = Button.CLICK_OFFSET
             else:
                 color = self._highlight_color
-        
-        rendered_text = self._font.render(self._text, True, color, self._bg_color)
+
+        rendered_text = self._font.render(self._text,
+                                          True, color, self._bg_color)
         rendered_text_rect = rendered_text.get_rect()
-        rendered_text_rect.center = (self._x + offset, self._y + self._h / 2 + offset)
+        rendered_text_rect.center = (self._x + offset,
+                                     self._y + self._h / 2 + offset)
         screen.blit(rendered_text, rendered_text_rect)
 
         # Testing Code
+
+
 if __name__ == "__main__":\
-    # a few constants for testing
+        # a few constants for testing
     TEST_X = 50
     TEST_Y = 50
     TEST_W = 200
@@ -107,6 +126,7 @@ if __name__ == "__main__":\
 
     # a simple sample function to set for the button action
     def test_click():
+        """Test whether button works when clicked."""
         print("The test button was clicked")
 
     # init pygame and open the window
@@ -115,7 +135,8 @@ if __name__ == "__main__":\
     quitting = False
 
     custom_font = pygame.font.Font("freesansbold.ttf", 32)
-    my_button = Button(TEST_X, TEST_Y+TEST_H, TEST_W, TEST_H, "OK", font=custom_font)
+    my_button = Button(TEST_X, TEST_Y+TEST_H, TEST_W, TEST_H,
+                       "OK", font=custom_font)
     my_button.set_action(test_click)
 
     while not quitting:
@@ -132,7 +153,7 @@ if __name__ == "__main__":\
                 my_button.mouse_click(event)
             if event.type == pygame.MOUSEBUTTONUP:
                 my_button.mouse_click(event)
-        #Clear The Screen
+        # Clear The Screen
         screen.fill(pygame.Color('black'))
 
         # draw my button
@@ -143,4 +164,3 @@ if __name__ == "__main__":\
 
     pygame.quit()
     quit()
-    
