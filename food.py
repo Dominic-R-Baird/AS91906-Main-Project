@@ -7,7 +7,7 @@ from mysprite import MySprite
 
 
 class Food(MySprite):
-    """Do."""
+    """Used to get certain functions from the MySprite class."""
 
     def __init__(self, x, y, w, h, screen, images):
         """Initialise what is needed from MySprite."""

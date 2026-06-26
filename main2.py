@@ -21,9 +21,9 @@ TILES_DOWN = 17
 BEACH_PERCENT = 0.7
 BEACH_TILES_X = int(TILES_ACROSS * BEACH_PERCENT)
 
-# logical screen size
 LOGICAL_X = 800
 LOGICAL_Y = 600
+
 
 X_OFFSET = (LOGICAL_X - (TILE_SIZE*TILES_ACROSS))/2
 Y_OFFSET = LOGICAL_Y - (TILE_SIZE*TILES_DOWN)
@@ -172,9 +172,15 @@ def main_game(screen, canvas, main_font):
 
     def game_over_screen(canvas, main_font):
         running = True
-        game_over = main_font.render('GAME OVER', True, FONT_COLOR, BG_COLOR)
+        # creating the texts
+        game_over = main_font.render('GAME OVER!', True, FONT_COLOR, BG_COLOR)
+        go_back = main_font.render('CLICK ANYWHERE TO CONTINUE', True, FONT_COLOR, BG_COLOR)
+        # making a rectangle for the text
         textRect = game_over.get_rect()
+        textRect2 = go_back.get_rect()
+        # centering the text in the screen
         textRect.center = (LOGICAL_X // 2, LOGICAL_Y // 2)
+        textRect2.center = (LOGICAL_X // 2, LOGICAL_Y // 1.5)
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -182,6 +188,7 @@ def main_game(screen, canvas, main_font):
                 if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
                     running = False
             canvas.blit(game_over, textRect)
+            canvas.blit(go_back, textRect2)
             # scale the canvas and blit
             scaled_canvas = pygame.transform.scale(canvas,
                                                    (screen_width,
@@ -367,6 +374,8 @@ def main_menu(screen, font_object):
 if __name__ == "__main__":
 
     # initialisation
+    screen_width = LOGICAL_X
+    screen_height = LOGICAL_Y
     
     # init the clock for FPS limit
     clock = pygame.time.Clock()

@@ -14,6 +14,7 @@ class MySprite():
 
     and have an animation.
     """
+
     def __init__(self, x, y, w, h, images, screen, direction=None):
         """Initialise the frames, dimensions, and images."""
         self.Rect = (x, y, w, h)
