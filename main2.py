@@ -10,7 +10,7 @@ from food import Food
 from enemy import Enemy
 
 # Constants
-FPS = 2
+SPEED_LIST = {"Slow": 2, "Medium": 4, "Fast": 6, "Insane": 15}
 # 16 x 9 aspect ratio
 TILE_SIZE = 32
 
@@ -35,6 +35,8 @@ SNAKE_BODY = 1
 SNAKE_TAIL = 2
 MAIN_FONT = 'arial'
 
+SETTINGS_FILENAME = "settings.json"
+
 
 # Global Colour Scheme
 FONT_COLOR = pygame.Color('mintcream')
@@ -56,27 +58,40 @@ def settings_menu(screen, font_object):
     # These functions are declared here as they are local to this function
 
     def speed_button_function():
+        global speed_fps
 
-        speed_list = ["slow", "medium", "fast", "SPEED"]
-        pass
+        if settings.speed == "Slow":
+            settings.speed = "Medium"
+        elif settings.speed == "Medium":
+            settings.speed = "Fast"
+        elif settings.speed == "Fast":
+            settings.speed = "Insane"
+        elif settings.speed == "Insane":
+            settings.speed = "Slow"
+
+        speed_fps = SPEED_LIST[settings.speed]
 
     def return_button_function():
         nonlocal quitting
         quitting = True
 
     # load background
-    settings_bg = pygame.transform.scale(pygame.image.load("images\\bg\\menu-background.png").convert_alpha(),
-                                         (LOGICAL_X, LOGICAL_Y))
-    # create the buttons
-
-    speed_button = Button(160, 180, BUTTON_WIDTH, BUTTON_HEIGHT, "Speed",
-                          font_object,
-                          FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
-    speed_button.set_action(speed_button_function)
-    return_button = Button(160, 420, BUTTON_WIDTH, BUTTON_HEIGHT, "Return",
+    try:
+        settings_bg = pygame.transform.scale(pygame.image.load("images\\bg\\menu-background.png").convert_alpha(),
+                                             (LOGICAL_X, LOGICAL_Y))
+    except:
+        print("Background file failed to load.")
+        exit(0)
+    # create and put the buttons in a dictionary
+    button_dict = {}
+    button_dict["speed_button"] = Button(LOGICAL_X / 4, LOGICAL_Y / 3, BUTTON_WIDTH, BUTTON_HEIGHT, "Speed",
+                                        font_object,
+                                        FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
+    button_dict["speed_button"].set_action(speed_button_function)
+    button_dict["return_button"] = Button(LOGICAL_X / 4, LOGICAL_Y * 2 / 3, BUTTON_WIDTH, BUTTON_HEIGHT, "Return",
                            font_object,
                            FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
-    return_button.set_action(return_button_function)
+    button_dict["return_button"] .set_action(return_button_function)
 
     quitting = False
     while not quitting:
@@ -96,20 +111,28 @@ def settings_menu(screen, font_object):
                                                  pygame.RESIZABLE)
             if event.type == pygame.MOUSEMOTION:
                 # checking coords of mouse
-                speed_button.mouse_move(scaled_coords[0], scaled_coords[1])
-                return_button.mouse_move(scaled_coords[0], scaled_coords[1])
+                for button in button_dict.values():
+                    button.mouse_move(scaled_coords[0], scaled_coords[1])
             if event.type == pygame.MOUSEBUTTONDOWN:
-                speed_button.mouse_click(event)
-                return_button.mouse_click(event)
+                for button in button_dict.values():
+                    button.mouse_click(event)
             if event.type == pygame.MOUSEBUTTONUP:
-                speed_button.mouse_click(event)
-                return_button.mouse_click(event)
+                for button in button_dict.values():
+                    button.mouse_click(event)
 
         # clear the screen
         canvas.blit(settings_bg)
 
-        speed_button.draw(canvas)
-        return_button.draw(canvas)
+        speed_setting = main_font.render(settings.speed, True, FONT_COLOR, BG_COLOR)
+        # making a rectangle for the text
+        text_rect = speed_setting.get_rect()
+        # centering the text in the screen
+        text_rect.center = (LOGICAL_X * 2  // 4, LOGICAL_Y // 3 + BUTTON_HEIGHT // 2  )
+
+
+        canvas.blit(speed_setting, text_rect)
+        for button in button_dict.values():
+            button.draw(canvas)
 
         # scale the canvas and blit
         scaled_canvas = pygame.transform.scale(canvas,
@@ -128,7 +151,7 @@ def main_game(screen, canvas, main_font):
 
         map_colors = {
             "beach": [(255, 235, 153), (255, 222, 89)],
-            "water": [(81, 112, 255), (92, 225, 230)]
+            "water": [(0, 32, 173), (92, 225, 230)]
         }
         game_screen = pygame.Surface((LOGICAL_X, LOGICAL_Y))
         game_screen.fill(map_colors["beach"][1])
@@ -176,19 +199,19 @@ def main_game(screen, canvas, main_font):
         game_over = main_font.render('GAME OVER!', True, FONT_COLOR, BG_COLOR)
         go_back = main_font.render('CLICK ANYWHERE TO CONTINUE', True, FONT_COLOR, BG_COLOR)
         # making a rectangle for the text
-        textRect = game_over.get_rect()
-        textRect2 = go_back.get_rect()
+        text_rect = game_over.get_rect()
+        text_rect2 = go_back.get_rect()
         # centering the text in the screen
-        textRect.center = (LOGICAL_X // 2, LOGICAL_Y // 2)
-        textRect2.center = (LOGICAL_X // 2, LOGICAL_Y // 1.5)
+        text_rect.center = (LOGICAL_X // 2, LOGICAL_Y // 2)
+        text_rect2.center = (LOGICAL_X // 2, LOGICAL_Y // 1.5)
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
                     running = False
-            canvas.blit(game_over, textRect)
-            canvas.blit(go_back, textRect2)
+            canvas.blit(game_over, text_rect)
+            canvas.blit(go_back, text_rect2)
             # scale the canvas and blit
             scaled_canvas = pygame.transform.scale(canvas,
                                                    (screen_width,
@@ -196,6 +219,12 @@ def main_game(screen, canvas, main_font):
             screen.blit(scaled_canvas, (0, 0))
 
             pygame.display.flip()
+
+    def is_enemy_tile(enemy_list, food_rect):
+        for enemy in enemy_list:
+            if enemy.collide(food_rect):
+                return True
+        return False
 
     canvas = pygame.Surface((LOGICAL_X, LOGICAL_Y))
     # load images
@@ -208,8 +237,8 @@ def main_game(screen, canvas, main_font):
                   TILE_SIZE, TILE_SIZE, TILE_SIZE, canvas, snake_images)
     food = None
     enemy_list = spawn_enemy(ENEMY_AMOUNT, canvas)
-    arena_rect = pygame.Rect(0, 0, TILES_ACROSS * TILE_SIZE + X_OFFSET,
-                             TILES_DOWN * TILE_SIZE + Y_OFFSET)
+    arena_rect = pygame.Rect(X_OFFSET + TILE_SIZE, Y_OFFSET + TILE_SIZE, (TILES_ACROSS - 2) * TILE_SIZE,
+                             (TILES_DOWN - 2) * TILE_SIZE)
 
     running = True
     while running:
@@ -247,18 +276,20 @@ def main_game(screen, canvas, main_font):
             food = Food(random.randint(0, TILES_ACROSS - 1) * TILE_SIZE + X_OFFSET,
                         random.randint(0, TILES_DOWN - 1) * TILE_SIZE + Y_OFFSET,
                         TILE_SIZE, TILE_SIZE, canvas, food_image)
-        if food.collide(snake.get_rect()):
-            snake.update(eating_food=True)
-            food = None
-            food = Food(random.randint(0, TILES_ACROSS - 1) * TILE_SIZE + X_OFFSET,
-                        random.randint(0, TILES_DOWN - 1) * TILE_SIZE + Y_OFFSET,
-                        TILE_SIZE, TILE_SIZE, canvas, food_image)
-        else:
-            snake.update()
+            if is_enemy_tile(enemy_list, food_rect=food.get_rect()):
+                food = None
+                print("food collided with enemy")
+        if not food is None:                    
+            if food.collide(snake.get_rect()):
+                snake.update(eating_food=True)
+                food = None
+            else:
+                snake.update()
 
         for enemy in enemy_list:
             if enemy.collide(snake.get_rect()):
                 snake.die = True
+
         if not snake.collide(arena_rect) or snake.collide_self():
             snake.die = True
         if snake.die:
@@ -272,7 +303,8 @@ def main_game(screen, canvas, main_font):
         canvas.fill(pygame.Color('black'))
         canvas.blit(game_bg, (0, 0))
         # draw interactive elements
-        food.draw()
+        if not food is None:
+            food.draw()
         for enemy in enemy_list:
             enemy.draw()
             enemy.animate()
@@ -283,7 +315,7 @@ def main_game(screen, canvas, main_font):
         screen.blit(scaled_canvas, (0, 0))
 
         pygame.display.flip()
-        clock.tick(FPS)
+        clock.tick(speed_fps)
     game_over_screen(canvas, main_font)
 
 def main_menu(screen, font_object):
@@ -309,23 +341,28 @@ def main_menu(screen, font_object):
         quitting = True
 
     # load background
-    menu_bg = pygame.transform.scale(pygame.image.load("images\\bg\\menu-background.png").convert_alpha(),
+    try:
+        menu_bg = pygame.transform.scale(pygame.image.load("images\\bg\\menu-background.png").convert_alpha(),
                                      (LOGICAL_X, LOGICAL_Y))
-    # create the buttons
-    start_button = Button(canvas.get_width()/2, (canvas.get_height()/6) * 2,
-                          BUTTON_WIDTH, BUTTON_HEIGHT, "Start", font_object,
-                          FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
-    start_button.set_action(start_button_function)
-    settings_button = Button(canvas.get_width()/2, (canvas.get_height()/6) * 3,
+    except:
+        print("Background file failed to load.")
+        exit(0)
+    # create and put the buttons in a dictionary
+    button_dict = {}
+    button_dict["start_button"] = Button(canvas.get_width()/2, (canvas.get_height()/6) * 2,
+                                        BUTTON_WIDTH, BUTTON_HEIGHT, "Start", font_object,
+                                        FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
+    button_dict["start_button"].set_action(start_button_function)
+    button_dict["settings_button"] = Button(canvas.get_width()/2, (canvas.get_height()/6) * 3,
                              BUTTON_WIDTH, BUTTON_HEIGHT,
                              "Settings", font_object,
                              FONT_COLOR, HIGHLIGHT_COLOR,
                              BG_COLOR, BORDER_COLOR)
-    settings_button.set_action(settings_button_function)
-    exit_button = Button(canvas.get_width()/2, (canvas.get_height()/6) * 4,
+    button_dict["settings_button"].set_action(settings_button_function)
+    button_dict["exit_button"] = Button(canvas.get_width()/2, (canvas.get_height()/6) * 4,
                          BUTTON_WIDTH, BUTTON_HEIGHT, "Exit", font_object,
                          FONT_COLOR, HIGHLIGHT_COLOR, BG_COLOR, BORDER_COLOR)
-    exit_button.set_action(exit_button_function)
+    button_dict["exit_button"].set_action(exit_button_function)
 
     quitting = False
     while not quitting:
@@ -345,24 +382,18 @@ def main_menu(screen, font_object):
                                                  pygame.RESIZABLE)
 
             if event.type == pygame.MOUSEMOTION:
-                start_button.mouse_move(scaled_coords[0], scaled_coords[1])
-                settings_button.mouse_move(scaled_coords[0], scaled_coords[1])
-                exit_button.mouse_move(scaled_coords[0], scaled_coords[1])
+                for button in button_dict.values():
+                    button.mouse_move(scaled_coords[0], scaled_coords[1])
             if event.type == pygame.MOUSEBUTTONDOWN:
-                start_button.mouse_click(event)
-                settings_button.mouse_click(event)
-                exit_button.mouse_click(event)
+                for button in button_dict.values():
+                    button.mouse_click(event)
             if event.type == pygame.MOUSEBUTTONUP:
-                start_button.mouse_click(event)
-                settings_button.mouse_click(event)
-                exit_button.mouse_click(event)
+                for button in button_dict.values():
+                    button.mouse_click(event)
         # clear the screen
         canvas.blit(menu_bg)
-
-        start_button.draw(canvas)
-        settings_button.draw(canvas)
-        exit_button.draw(canvas)
-
+        for button in button_dict.values():
+            button.draw(canvas)
         # scale the canvas and blit
         scaled_canvas = pygame.transform.scale(canvas,
                                                (screen_width, screen_height))
@@ -376,7 +407,12 @@ if __name__ == "__main__":
     # initialisation
     screen_width = LOGICAL_X
     screen_height = LOGICAL_Y
-    
+
+    # init settings
+    settings = Settings(SETTINGS_FILENAME)
+    settings.read_settings()
+    # init the fps
+    speed_fps = SPEED_LIST[settings.speed]
     # init the clock for FPS limit
     clock = pygame.time.Clock()
 
@@ -393,3 +429,5 @@ if __name__ == "__main__":
     main_menu(screen, main_font)
 
     pygame.quit()
+
+    settings.write_settings()

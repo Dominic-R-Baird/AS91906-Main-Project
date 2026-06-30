@@ -1,54 +1,65 @@
-import json
-from os.path import exists
-# defaults
-DEFAULTS = {"brightness": 100
+"""This file helps to keep a permanent copy of known settings."""
 
-}
+import json
+
+# defaults
+DEFAULTS = {"speed": "Slow"}
 
 # constraints
-TEST_FILENAME = "test.json"
-MIN_BRIGHTNESS = 0
-MAX_BRIGHTNESS = 100
+DEFAULT_FILENAME = "settings.json"
+
+
 class Settings():
+    """Represents a permanent copy of known settings."""
+
     def __init__(self, filename):
+        """Initalise the filename and the defaults."""
         self._filename = filename
         self._settings = DEFAULTS
         # check for file and load settings
 
-
-
     def write_json(self, filename, object):
+        """Write what you want in one file to json."""
         try:
             output_file = open(filename, "w", encoding="utf-8")
             output_file.write(json.dumps(object))
             output_file.close()
             return True
         except:
-            print("Failed to open file")
+            print(f"Failed to open file {filename} for write")
             return False
 
     def write_settings(self):
+        """Write from json into the file chosen."""
         result = self.write_json(self._filename, self._settings)
         return result
 
+    def read_settings(self):
+        """Read from the json."""
+        result = self.read_json(self._filename)
+        if result is not None:
+            self._settings = result
+
     def read_json(self, filename):
+        """Read from the json file."""
         try:
-           with open(filename, "r", encoding="utf-8") as input_file:
-            return json.load(input_file)
+            with open(filename, "r", encoding="utf-8") as input_file:
+                return json.load(input_file)
 
         except:
-            pass
+            print(f"file {filename} failed to read/decode.")
+            return None
 
+    def get_speed(self):
+        """Get the speed."""
+        return self._settings["speed"]
 
-    def get_brightness(self):
-        return self._settings["brightness"]
-    def set_brightness(self, brightness):
-        if brightness < MIN_BRIGHTNESS:
-            print("invalid brightness")
-            exit(0)
+    def set_speed(self, speed):
+        """Set the speed and make it a property."""
+        self._settings["speed"] = speed
+    speed = property(get_speed, set_speed, None)
 
-    brightness = property(get_brightness, set_brightness, None)
 
 if __name__ == "__main__":
     print("testing not yet implemented")
-    my_setting = Settings(TEST_FILENAME)
+    my_setting = Settings(DEFAULT_FILENAME)
